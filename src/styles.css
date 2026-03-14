@@ -1195,17 +1195,17 @@ textarea {
 
 .settings-section-pro {
   border-top: 3px solid var(--good);
-  background: rgba(75, 112, 89, 0.03);
+  background: linear-gradient(180deg, rgba(75, 112, 89, 0.06), rgba(255, 252, 246, 0.72));
 }
 
 .settings-section-con {
   border-top: 3px solid var(--accent);
-  background: rgba(188, 106, 65, 0.03);
+  background: linear-gradient(180deg, rgba(188, 106, 65, 0.06), rgba(255, 252, 246, 0.72));
 }
 
 .settings-section-judge {
   border-top: 3px solid var(--ink);
-  background: rgba(37, 33, 28, 0.02);
+  background: linear-gradient(180deg, rgba(37, 33, 28, 0.05), rgba(255, 252, 246, 0.72));
 }
 
 .settings-grid {
