@@ -5,6 +5,10 @@ import { normalizeBaseUrl } from "../core.js";
 
 const providerCache = new Map();
 
+export function clearProviderCache() {
+  providerCache.clear();
+}
+
 export function validateAgent(agent) {
   if (!agent?.baseUrl || !agent?.apiKey || !agent?.model) {
     throw new Error(`${agent?.name || "Agent"} is missing Base URL, API Key, or Model.`);

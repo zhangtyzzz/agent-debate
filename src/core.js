@@ -5,7 +5,7 @@ export const DEFAULT_EXA_MCP_ID = "exa-search";
 export const DEFAULT_EXA_MCP = {
   id: DEFAULT_EXA_MCP_ID,
   name: "Exa Search",
-  url: "https://mcp.exa.ai/mcp?tools=web_search_exa",
+  url: "https://mcp.exa.ai/mcp",
   description: "Default web search MCP. Add your Exa API key to the URL as ?exaApiKey=YOUR_EXA_API_KEY if needed.",
   headers: "",
   enabled: true,

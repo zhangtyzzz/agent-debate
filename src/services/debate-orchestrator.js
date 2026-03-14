@@ -2,8 +2,9 @@ import {
   buildMarkdownReport,
   clampInt,
   normalizeJudgeVerdictText,
+  safeParseJson,
 } from "../core.js";
-import { createTranslator } from "../i18n.js";
+import { createTranslator, createReportLabels } from "../i18n.js";
 import { chatCompletion } from "./chat.js";
 import { createMcpRuntime } from "./mcp.js";
 
@@ -430,7 +431,9 @@ async function runJudgeVerdict({ stepIndex, phase, debateContext, payload, trans
         metadata: entry.metadata,
       },
     });
-    return report;
+    if (report.winner !== "Unknown" || attempt === retries) {
+      return report;
+    }
   }
 
   throw new Error("Judge verdict generation failed.");
@@ -811,26 +814,8 @@ function createClientLabels(locale) {
     roundMeta: (round) => t("roundMeta", { round }),
     toolMeta: (count) => t("toolCountMeta", { count }),
     runningStatus: (name) => `${name} ${locale === "zh-CN" ? "运行中" : "running"}`,
-    verdictMeta: (confidence) => `${t("verdictMeta")} · ${confidence}%`,
+    verdictMeta: (winner) => `${t("verdictMeta")} · ${winner}`,
     completed: t("completed"),
-  };
-}
-
-function createReportLabels(locale) {
-  const t = createTranslator(locale);
-  return {
-    reportTitle: t("reportTitle"),
-    reportTopic: t("reportTopic"),
-    winnerLabel: t("winnerLabel"),
-    winnerPro: t("winnerPro"),
-    winnerCon: t("winnerCon"),
-    keyArgumentsPro: t("keyArgumentsPro"),
-    keyArgumentsCon: t("keyArgumentsCon"),
-    keyDisagreements: t("coreDisagreements"),
-    unresolvedQuestions: t("unresolvedQuestions"),
-    judgeReasoning: t("judgeOutput"),
-    reportArticle: t("reportArticle"),
-    confidence: t("confidence"),
   };
 }
 
