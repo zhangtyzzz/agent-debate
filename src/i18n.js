@@ -372,3 +372,21 @@ export function createTranslator(locale = "en") {
     );
   };
 }
+
+export function createReportLabels(locale = "en") {
+  const t = createTranslator(locale);
+  return {
+    reportTitle: t("reportTitle"),
+    reportTopic: t("reportTopic"),
+    winnerLabel: t("winnerLabel"),
+    winnerPro: t("winnerPro"),
+    winnerCon: t("winnerCon"),
+    keyArgumentsPro: t("keyArgumentsPro"),
+    keyArgumentsCon: t("keyArgumentsCon"),
+    keyDisagreements: t("coreDisagreements"),
+    unresolvedQuestions: t("unresolvedQuestions"),
+    judgeReasoning: t("judgeOutput"),
+    reportArticle: t("reportArticle"),
+    confidence: t("confidence"),
+  };
+}

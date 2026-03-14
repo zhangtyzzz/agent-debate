@@ -4,27 +4,91 @@
 
 [![使用 Vercel 一键部署](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zhangtyzzz/agent-debate)
 
-`Agent Debate` 是一个本地优先的 React 多 Agent 辩论应用。它会让 `Pro Agent`、`Con Agent` 和 `Judge Agent` 围绕同一议题展开结构化辩论，用聊天式 transcript 展示推理、工具调用和最终回答，并生成裁决与综合文章。
+**让正方、反方和裁判三个 AI Agent 围绕任意复杂话题展开结构化辩论 — 只需要你自己的 OpenAI 兼容接口。**
+
+`Agent Debate` 是一个本地优先的 React 多 Agent 辩论应用。它会让正方 Agent、反方 Agent 和裁判 Agent 围绕同一议题展开多轮辩论，用聊天式 transcript 展示推理、工具调用和最终回答，并生成裁决与综合文章。
+
+![辩论页 — 议题表单与实时对话记录](./docs/screenshot-debate-zh.png)
+
+---
+
+## 快速开始
+
+### 1. 安装并启动
+
+```bash
+git clone https://github.com/zhangtyzzz/agent-debate.git
+cd agent-debate
+npm install
+npm run dev
+```
+
+打开 [http://localhost:4173](http://localhost:4173)。
+
+### 2. 配置 Agent
+
+你只需要一个 **OpenAI 兼容的 API 接口**。切换到「设置」页面，为每个 Agent（正方、反方、裁判）填写三个字段：
+
+| 字段     | 示例                                     | 说明                                   |
+| -------- | ---------------------------------------- | -------------------------------------- |
+| Base URL | `https://api.openai.com/v1`              | 任何兼容 OpenAI Chat Completions 的接口地址 |
+| 模型     | `gpt-4.1-mini`                           | 你的接口所支持的模型名称               |
+| API Key  | `sk-...`                                 | 仅保存在浏览器 local storage 中        |
+
+三个 Agent 可以共用同一个接口和 Key，也可以混搭不同服务商（OpenAI、DeepSeek、Ollama、本地 vLLM 等）。Temperature 可选，默认值即可。
+
+![设置页 — 按颜色区分的正方 / 反方 / 裁判 Agent 配置](./docs/screenshot-settings-zh.png)
+
+> **就这些。** 不需要服务端环境变量，不需要 `.env` 文件，不需要数据库。所有配置都在浏览器中完成并保存在 local storage 里。
+
+### 3. 发起辩论
+
+1. 切换到「发起辩论」页
+2. 输入一个话题，比如 *"创业公司是否应该用持续规划替代年度规划？"*
+3. 可选：添加背景信息、调整轮数（1–10）、更改输出语言
+4. 点击「开始辩论」
+
+正方和反方 Agent 会实时辩论。所有轮次结束后，裁判会给出裁决并撰写综合文章。
+
+### 4. 查看结果
+
+- **对话记录** — 实时观看辩论展开，包括流式文本、推理链和工具调用
+- **结果报告** — 查看结构化裁决、核心论点、争议焦点和综合文章
+- **导出** — 支持导出为 PNG 长图、Markdown 文件，或复制到剪贴板
+
+### 5. 可选：添加 MCP 工具
+
+通过 [MCP 服务](https://modelcontextprotocol.io/)给 Agent 接入联网搜索或其他工具：
+
+1. 进入「设置 → MCP Servers」
+2. 添加服务 URL（如 `https://mcp.exa.ai/mcp`）
+3. 点击「测试并发现」查看可用工具
+4. 在每个 Agent 配置中勾选需要使用的 MCP 服务
+
+默认已预配置一个 Exa 联网搜索服务。
+
+---
 
 ## 核心能力
 
 - 聊天流式 transcript，而不是传统分栏辩论板
-- `Pro` / `Con` / `Judge` 独立模型配置
+- `正方` / `反方` / `裁判` 独立模型配置
 - 多轮结构化辩论编排
 - 在 transcript 中流式展示回答、思考过程和工具活动
 - MCP 工具发现与按 Agent 绑定
 - 裁判胜负裁决 + 综合文章输出
-- 本地历史记录与 transcript 导出
+- 本地历史记录与 transcript 导出（PNG / Markdown）
 - 内置中英文界面
-- 可直接部署到 Vercel 的静态前端
+- 单步重跑，无需重启整场辩论
+- 可直接部署到 Vercel / Cloudflare Pages 的静态前端
 - 自带可选的 Vercel / Cloudflare Pages MCP 代理入口
 
 ## 技术栈
 
-- React 19
-- Vite 7
+- React 19、Vite 7、TailwindCSS v4
 - AI SDK + OpenAI-compatible provider
 - `@ai-sdk/mcp`
+- Vercel Analytics
 - Node 内置测试运行器
 
 ## 目录结构
@@ -36,13 +100,23 @@
 ├── functions/
 │   └── api/mcp.js              # Cloudflare Pages Functions MCP 代理入口
 ├── src/
-│   ├── App.jsx                 # 主应用界面
+│   ├── App.jsx                 # 主应用界面（状态 + 路由）
 │   ├── core.js                 # 默认配置与通用工具
-│   ├── i18n.js                 # 国际化
+│   ├── i18n.js                 # 国际化（zh-CN、en）
+│   ├── components/
+│   │   ├── TranscriptEntry.jsx # 辩论消息气泡
+│   │   ├── ReportPanel.jsx     # 裁决 + 报告视图
+│   │   ├── HistoryPanel.jsx    # 辩论历史列表
+│   │   ├── SettingsPanel.jsx   # Agent / MCP / 默认参数配置
+│   │   ├── ErrorBoundary.jsx   # 渲染错误捕获 + 重试
+│   │   ├── ui/                 # 基础 UI 组件
+│   │   └── ai-elements/        # 聊天 UI 组件
 │   ├── services/
 │   │   ├── chat.js             # 模型调用
 │   │   ├── debate-orchestrator.js
 │   │   └── mcp.js
+│   ├── utils/
+│   │   └── app-helpers.jsx     # 共享辅助函数
 │   └── server/
 │       └── mcp-proxy.js        # 共享 MCP 代理逻辑
 ├── tests/
@@ -76,7 +150,7 @@ npm run check
 
 ## MCP 代理到底是做什么的
 
-这个 MCP 代理不是强制要用的，它主要解决“浏览器不适合直接访问 MCP 服务”的场景。
+这个 MCP 代理不是强制要用的，它主要解决"浏览器不适合直接访问 MCP 服务"的场景。
 
 适合使用代理的情况：
 

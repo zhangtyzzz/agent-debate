@@ -16,7 +16,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test",
+    "test": "node --test tests/core.test.js tests/i18n.test.js tests/i18n-report-labels.test.js tests/chat.test.js tests/debate-orchestrator.test.js tests/mcp.test.js tests/app-helpers.test.js",
+    "test:e2e": "node --test tests/e2e.test.js",
     "check": "npm test && npm run build"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "@streamdown/math": "^1.0.2",
     "@streamdown/mermaid": "^1.0.2",
     "@tailwindcss/vite": "^4.2.1",
+    "@vercel/analytics": "^2.0.1",
     "@vitejs/plugin-react": "^5.2.0",
     "ai": "^6.0.116",
     "class-variance-authority": "^0.7.1",
