@@ -1,0 +1,192 @@
+import { generateText, stepCountIs, streamText } from "ai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+
+import { normalizeBaseUrl } from "../core.js";
+
+const providerCache = new Map();
+
+export function validateAgent(agent) {
+  if (!agent?.baseUrl || !agent?.apiKey || !agent?.model) {
+    throw new Error(`${agent?.name || "Agent"} is missing Base URL, API Key, or Model.`);
+  }
+}
+
+export async function chatCompletion(agent, messages, maxTokens, options = {}) {
+  validateAgent(agent);
+
+  const model = getModel(agent);
+  const normalizedMessages = toModelMessages(messages);
+  const tools = options.tools || {};
+  const hasTools = Object.keys(tools).length > 0;
+  const maxToolSteps = Math.max(0, Number(options.maxToolSteps || 0));
+  const sharedConfig = {
+    model,
+    messages: normalizedMessages,
+    temperature: agent.temperature,
+    maxOutputTokens: maxTokens,
+    abortSignal: options.signal,
+    ...(hasTools
+      ? {
+          tools,
+          stopWhen: stepCountIs(maxToolSteps + 1),
+        }
+      : {}),
+  };
+
+  if (options.stream) {
+    return runStreamingText(sharedConfig, options);
+  }
+
+  return runGenerateText(sharedConfig, options);
+}
+
+export function toModelMessages(messages) {
+  return messages.map((message) => ({
+    role: message.role,
+    content: typeof message.content === "string" ? message.content : String(message.content || ""),
+  }));
+}
+
+async function runStreamingText(config, options) {
+  const toolCalls = [];
+  const result = streamText({
+    ...config,
+    async onChunk({ chunk }) {
+      switch (chunk.type) {
+        case "text-delta":
+          options.onDelta?.(chunk.text);
+          break;
+        case "reasoning-delta":
+          options.onReasoningDelta?.(chunk.text);
+          break;
+        case "tool-input-start":
+          options.onToolEvent?.({
+            id: chunk.id,
+            tool: chunk.toolName,
+            args: {},
+            result: "",
+            status: "planned",
+          });
+          options.onToolEvent?.({
+            id: chunk.id,
+            tool: chunk.toolName,
+            args: {},
+            result: "",
+            status: "running",
+          });
+          break;
+        case "tool-call":
+          toolCalls.push({
+            id: chunk.toolCallId || chunk.toolName,
+            tool: chunk.toolName,
+            args: chunk.input,
+          });
+          break;
+        case "tool-result":
+          options.onToolEvent?.({
+            id: chunk.toolCallId,
+            tool: chunk.toolName,
+            args: chunk.input,
+            result: stringifyOutput(chunk.output),
+            status: "completed",
+          });
+          break;
+        case "tool-error":
+          options.onToolEvent?.({
+            id: chunk.toolCallId,
+            tool: chunk.toolName,
+            args: chunk.input,
+            result: chunk.errorText,
+            status: "failed",
+          });
+          break;
+        default:
+          break;
+      }
+    },
+  });
+
+  const [text, reasoningText, finishReason] = await Promise.all([
+    result.text,
+    result.reasoningText,
+    result.finishReason,
+  ]);
+
+  return {
+    text: String(text || "").trim(),
+    reasoningText: normalizeReasoningText(reasoningText, text),
+    finishReason,
+    truncated: finishReason === "length",
+    toolCalls: toolCalls.map(normalizeTrackedToolCall),
+  };
+}
+
+async function runGenerateText(config) {
+  const result = await generateText(config);
+  const [text, reasoningText, finishReason, dynamicToolCalls] = await Promise.all([
+    result.text,
+    result.reasoningText,
+    result.finishReason,
+    result.dynamicToolCalls,
+  ]);
+
+  return {
+    text: String(text || "").trim(),
+    reasoningText: normalizeReasoningText(reasoningText, text),
+    finishReason,
+    truncated: finishReason === "length",
+    toolCalls: dynamicToolCalls.map((call) => ({
+      id: call.toolCallId,
+      type: "function",
+      function: {
+        name: call.toolName,
+        arguments: JSON.stringify(call.input || {}),
+      },
+      parsedArguments: call.input && typeof call.input === "object" ? call.input : {},
+    })),
+  };
+}
+
+function getModel(agent) {
+  const baseURL = normalizeBaseUrl(agent.baseUrl);
+  const cacheKey = `${baseURL}::${agent.apiKey}`;
+  if (!providerCache.has(cacheKey)) {
+    providerCache.set(
+      cacheKey,
+      createOpenAICompatible({
+        name: "custom-openai-compatible",
+        apiKey: agent.apiKey,
+        baseURL,
+      }),
+    );
+  }
+  return providerCache.get(cacheKey)(agent.model);
+}
+
+function normalizeTrackedToolCall(toolCall) {
+  return {
+    id: toolCall.id,
+    type: "function",
+    function: {
+      name: toolCall.tool,
+      arguments: JSON.stringify(toolCall.args || {}),
+    },
+    parsedArguments: toolCall.args && typeof toolCall.args === "object" ? toolCall.args : {},
+  };
+}
+
+function normalizeReasoningText(reasoningText, text) {
+  const finalReasoning = String(reasoningText || "").trim();
+  if (!finalReasoning) return "";
+  if (!String(text || "").trim()) return "";
+  return finalReasoning;
+}
+
+function stringifyOutput(output) {
+  if (typeof output === "string") return output;
+  try {
+    return JSON.stringify(output, null, 2);
+  } catch {
+    return String(output ?? "");
+  }
+}

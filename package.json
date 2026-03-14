@@ -1,0 +1,61 @@
+{
+  "name": "agent-debate",
+  "version": "1.0.0",
+  "description": "Local-first multi-agent debate UI with MCP tools, streaming transcript, and deployable Vercel proxy support.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhangtyzzz/agent-debate.git"
+  },
+  "homepage": "https://github.com/zhangtyzzz/agent-debate",
+  "bugs": {
+    "url": "https://github.com/zhangtyzzz/agent-debate/issues"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test",
+    "check": "npm test && npm run build"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2",
+    "vite": "^7.1.3"
+  },
+  "dependencies": {
+    "@ai-sdk/mcp": "^1.0.25",
+    "@ai-sdk/openai-compatible": "^2.0.35",
+    "@ai-sdk/react": "^3.0.118",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@radix-ui/react-use-controllable-state": "^1.2.2",
+    "@streamdown/cjk": "^1.0.2",
+    "@streamdown/code": "^1.1.0",
+    "@streamdown/math": "^1.0.2",
+    "@streamdown/mermaid": "^1.0.2",
+    "@tailwindcss/vite": "^4.2.1",
+    "@vitejs/plugin-react": "^5.2.0",
+    "ai": "^6.0.116",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dompurify": "^3.3.3",
+    "html-to-image": "^1.11.13",
+    "jszip": "^3.10.1",
+    "lucide-react": "^0.577.0",
+    "marked": "^17.0.4",
+    "motion": "^12.36.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "shiki": "^4.0.2",
+    "streamdown": "^2.4.0",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.1",
+    "tw-animate-css": "^1.4.0",
+    "use-stick-to-bottom": "^1.1.3",
+    "zod": "^4.3.6"
+  }
+}
