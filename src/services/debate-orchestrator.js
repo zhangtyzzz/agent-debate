@@ -564,14 +564,10 @@ function buildAgentInstructions(agentConfig, debateContext, agentKey, toolCatalo
   const side = agentKey === "pro" ? "affirmative" : agentKey === "con" ? "negative" : "judge";
   const styleGuide = buildStyleGuide(debateContext.writingStyle);
   const toolText = buildToolCatalogText(toolCatalog.filter((tool) => agentConfig.mcpIds.includes(tool.serverId)));
-  const now = new Date();
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const currentTime = `${now.toLocaleDateString("en-CA", { timeZone })} ${now.toLocaleTimeString("en-GB", { timeZone })} (${timeZone})`;
   return `${agentConfig.systemPrompt}
 
 You must debate in ${debateContext.outputLanguage}.
 Keep answers concise, structured, and incremental.
-Current time: ${currentTime}
 Debate topic: ${debateContext.topic}
 ${debateContext.context ? `Context:\n${debateContext.context}` : ""}
 Total rounds: ${debateContext.rounds}
