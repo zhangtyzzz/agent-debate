@@ -1,39 +1,45 @@
-# Agent Debate Contributor Notes
+# Agent Debate — Contributor Notes
+
+Product design rules and guardrails for AI agents and human contributors working on this codebase.
 
 ## Product Intent
 
-- The transcript should feel like a messaging app, not a debate dashboard.
-- `Pro` messages are right-aligned, `Con` messages are left-aligned, and `Judge` / `System` messages are centered summary cards.
-- Users should stay in the transcript after a run completes. Do not auto-switch to the report tab.
+- The transcript is a **messaging app**, not a dashboard. Bubbles, not panels.
+- After a debate run completes, keep the user on the transcript tab. Do not auto-switch to report.
 
-## Transcript Behavior
+## Transcript Rules
 
-- Show reasoning and tool activity before the final answer inside each message card.
-- Reasoning and tool panels may open while they are actively streaming or running.
-- Once reasoning or tool execution finishes, they should auto-collapse so the final answer regains focus.
-- Judge output must remain visible in the transcript even though a separate report tab exists.
+- Reasoning and tool activity render **before** the final answer inside each message card.
+- Reasoning/tool panels open while streaming, then auto-collapse when done so the answer regains focus.
+- Judge output stays visible in the transcript even though a separate report tab exists.
 
-## Prompting Rules
+## Prompt Construction
 
-- The MVP exposes controlled `writingStyle` plus MCP tools. Do not introduce a free-form user-facing `Skill` editor.
-- Agent-level `systemPrompt` is internal configuration, not a casual end-user editing surface.
-- Prompt construction should preserve a stable reusable prefix whenever possible.
-- Dynamic task instructions should be appended in a trailing `<system-reminder>` block instead of destabilizing the reusable prefix.
+- Preserve a stable, reusable system prefix. Append dynamic instructions in a trailing `<system-reminder>` block — never destabilize the prefix.
+- `systemPrompt` per agent is internal config, not an end-user editing surface.
 
 ## Localization
 
-- In Chinese UI, prefer `正方 Agent` / `反方 Agent` / `裁判 Agent`.
-- Winner labels shown in UI and exported Markdown must follow the active locale.
+- All user-facing strings must use the `i18n.js` translator; never hardcode display text.
+- Chinese UI: 正方 Agent / 反方 Agent / 裁判 Agent.
+- Winner labels in UI and exported Markdown must follow the active locale.
 
-## Layout Guardrails
+## Layout
 
-- Prefer flexbox for transcript row alignment.
-- Keep message bubbles width-capped but naturally expandable for long paragraphs.
-- Validate transcript rendering with CJK text and long unbroken strings.
-- If transcript layout changes, verify both normal reading and PNG export output.
+- Pro = right-aligned, Con = left-aligned, Judge/System = centered.
+- Bubbles: width-capped, flexbox alignment.
+- Pro bubble inner elements use green-tinted CSS variables scoped via `.ai-entry-shell-pro`; Con uses the default warm palette.
+- Validate any layout change with CJK text, long unbroken strings, and PNG export.
 
-## Release Bar
+## Testing
 
-- Remove temporary debug code, throwaway files, and stale docs before release.
-- Keep README, Chinese README, and deployment instructions synchronized.
-- Vercel deployment should work with repository import and the included `vercel.json`.
+- Every new feature or behavior change must have corresponding tests. No exception.
+- If the change touches logic that has no existing tests, write the tests first.
+- All tests must pass (`npm run check`) before any change is considered complete.
+- Tests exist to keep iteration stable and impact controllable — treat them as a hard gate, not a nice-to-have.
+
+## Release Checklist
+
+- Remove debug code and throwaway files before release.
+- Keep README, Chinese README, and deploy docs synchronized.
+- Verify Vercel deploy works with `vercel.json` as-is.
