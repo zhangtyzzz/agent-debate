@@ -32,7 +32,9 @@ export async function chatCompletion(agent, messages, maxTokens, options = {}) {
     ...(hasTools
       ? {
           tools,
-          stopWhen: stepCountIs(maxToolSteps + 1),
+          // Allow maxToolSteps tool rounds + 1 final text-only round.
+          stopWhen: stepCountIs(maxToolSteps + 2),
+          prepareStep: createToolBudgetGuard(maxToolSteps),
         }
       : {}),
   };
@@ -176,6 +178,20 @@ function normalizeTrackedToolCall(toolCall) {
       arguments: JSON.stringify(toolCall.args || {}),
     },
     parsedArguments: toolCall.args && typeof toolCall.args === "object" ? toolCall.args : {},
+  };
+}
+
+/**
+ * Creates a `prepareStep` callback that forces `toolChoice: "none"` once the
+ * tool-call budget is exhausted, guaranteeing the model always produces a
+ * final text response instead of being silently truncated.
+ */
+export function createToolBudgetGuard(maxToolSteps) {
+  return function prepareStep({ stepNumber }) {
+    if (stepNumber >= maxToolSteps + 1) {
+      return { toolChoice: "none" };
+    }
+    return undefined;
   };
 }
 
