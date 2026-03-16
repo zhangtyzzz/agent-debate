@@ -161,10 +161,45 @@ function getModel(agent) {
         name: "custom-openai-compatible",
         apiKey: agent.apiKey,
         baseURL,
+        transformRequestBody: sanitizeRequestBody,
       }),
     );
   }
   return providerCache.get(cacheKey)(agent.model);
+}
+
+/**
+ * Strip empty `content` from assistant messages that carry tool_calls.
+ * The SDK emits `content: ""` (string) or array blocks with `{"type":"text","text":""}`.
+ * Some OpenAI-compatible endpoints reject empty text alongside tool_calls.
+ */
+export function sanitizeRequestBody(body) {
+  if (!body?.messages || !Array.isArray(body.messages)) return body;
+  let changed = false;
+  const messages = body.messages.map((msg) => {
+    // Only touch assistant messages that have tool_calls
+    if (msg.role !== "assistant" || !msg.tool_calls?.length) return msg;
+
+    // String content: "" → null
+    if (typeof msg.content === "string" && msg.content === "") {
+      changed = true;
+      return { ...msg, content: null };
+    }
+
+    // Array content: filter empty text blocks
+    if (Array.isArray(msg.content)) {
+      const filtered = msg.content.filter(
+        (block) => block.type !== "text" || (block.text != null && block.text !== ""),
+      );
+      if (filtered.length !== msg.content.length) {
+        changed = true;
+        return { ...msg, content: filtered.length ? filtered : null };
+      }
+    }
+
+    return msg;
+  });
+  return changed ? { ...body, messages } : body;
 }
 
 function normalizeTrackedToolCall(toolCall) {

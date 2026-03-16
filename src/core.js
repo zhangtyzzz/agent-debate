@@ -9,6 +9,7 @@ export const DEFAULT_EXA_MCP = {
   description: "Default web search MCP. Add your Exa API key to the URL as ?exaApiKey=YOUR_EXA_API_KEY if needed.",
   headers: "",
   enabled: true,
+  directConnect: false,
   toolCache: [],
   disabledTools: [],
 };
@@ -96,6 +97,7 @@ export function mergeMcps(mcps) {
   const hasExa = parsedMcps.some((item) => item?.id === DEFAULT_EXA_MCP_ID);
   const normalized = parsedMcps.map((item) => ({
     ...item,
+    directConnect: item?.directConnect === true,
     toolCache: Array.isArray(item?.toolCache) ? item.toolCache : [],
     disabledTools: Array.isArray(item?.disabledTools) ? item.disabledTools : [],
   }));

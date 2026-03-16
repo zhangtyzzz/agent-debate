@@ -36,7 +36,7 @@ export function createMcpRuntime(servers, options = {}) {
           version: "1.0.0",
           transport: {
             type: "http",
-            url: proxyUrl(server.url),
+            url: resolveTransportUrl(server),
             headers: parseHeadersJson(server.headers),
           },
           onUncaughtError(error) {
@@ -47,6 +47,10 @@ export function createMcpRuntime(servers, options = {}) {
     }
     return clients.get(server.id);
   }
+}
+
+export function resolveTransportUrl(server) {
+  return server.directConnect ? server.url : proxyUrl(server.url);
 }
 
 function proxyUrl(target) {
