@@ -146,6 +146,7 @@ export function SettingsPanel({
                   description: "",
                   headers: "",
                   enabled: true,
+                  directConnect: false,
                   toolCache: [],
                   disabledTools: [],
                 },
@@ -204,6 +205,13 @@ export function SettingsPanel({
                   <span>
                     <strong>{t("enabled")}</strong>
                     <small>{t("enabledHint")}</small>
+                  </span>
+                </label>
+                <label className="check-card field full toggle-card">
+                  <input type="checkbox" checked={server.directConnect === true} onChange={(event) => onUpdateMcp(index, "directConnect", event.target.checked)} />
+                  <span>
+                    <strong>{t("directConnect")}</strong>
+                    <small>{t("directConnectHint")}</small>
                   </span>
                 </label>
                 <div className="field full">
