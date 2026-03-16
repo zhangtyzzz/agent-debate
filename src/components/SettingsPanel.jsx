@@ -147,6 +147,7 @@ export function SettingsPanel({
                   headers: "",
                   enabled: true,
                   toolCache: [],
+                  disabledTools: [],
                 },
               ],
             }))}
@@ -209,7 +210,25 @@ export function SettingsPanel({
                   <label>{t("discoveredTools")}</label>
                   <div className="tool-cache">
                     {(server.toolCache || []).length
-                      ? server.toolCache.map((tool) => <span className="tool-chip" key={`${server.id}:${tool.name}`}>{tool.name}</span>)
+                      ? server.toolCache.map((tool) => {
+                        const disabled = (server.disabledTools || []).includes(tool.name);
+                        return (
+                          <button
+                            type="button"
+                            className={`tool-chip${disabled ? " tool-chip-disabled" : ""}`}
+                            key={`${server.id}:${tool.name}`}
+                            title={disabled ? t("toolDisabledHint") : t("toolEnabledHint")}
+                            onClick={() => {
+                              const next = disabled
+                                ? (server.disabledTools || []).filter((n) => n !== tool.name)
+                                : [...(server.disabledTools || []), tool.name];
+                              onUpdateMcp(index, "disabledTools", next);
+                            }}
+                          >
+                            {tool.name}
+                          </button>
+                        );
+                      })
                       : <p className="inline-hint">{t("noToolsDiscovered")}</p>}
                   </div>
                 </div>

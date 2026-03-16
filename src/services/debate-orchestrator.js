@@ -1,6 +1,7 @@
 import {
   buildMarkdownReport,
   clampInt,
+  isToolEnabled,
   normalizeJudgeVerdictText,
   safeParseJson,
 } from "../core.js";
@@ -198,6 +199,7 @@ async function buildToolCatalog(mcps, mcpRuntime) {
       const tools = await mcpRuntime.listTools(server);
       server.toolCache = tools;
       for (const tool of tools) {
+        if (!isToolEnabled(server, tool.name)) continue;
         catalog.push({
           serverId: server.id,
           name: tool.name,
@@ -832,6 +834,7 @@ async function buildAgentToolSet(agent, servers, mcpRuntime) {
   for (const server of selectedServers) {
     const tools = await mcpRuntime.getTools(server);
     for (const [name, tool] of Object.entries(tools)) {
+      if (!isToolEnabled(server, name)) continue;
       if (entries.some(([existingName]) => existingName === name)) {
         throw new Error(`Duplicate MCP tool name detected: ${name}. Rename one of the tools or disable one server.`);
       }
