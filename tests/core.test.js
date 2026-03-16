@@ -8,7 +8,9 @@ import {
   clampInt,
   createMarkdownFilename,
   detectVerdictWinner,
+  isToolEnabled,
   mergeDefaults,
+  mergeMcps,
   normalizeJudgeVerdictText,
   parseHeadersJson,
   safeParseJson,
@@ -106,4 +108,32 @@ test("buildMarkdownReport supports localized labels", () => {
 test("createMarkdownFilename slugifies topic", () => {
   assert.equal(createMarkdownFilename("Should AI replace PMs?"), "should-ai-replace-pms.md");
   assert.equal(clampInt(999, 0, 100), 100);
+});
+
+test("isToolEnabled returns true when tool is not in disabledTools", () => {
+  const server = { disabledTools: ["disabled_tool"] };
+  assert.equal(isToolEnabled(server, "enabled_tool"), true);
+});
+
+test("isToolEnabled returns false when tool is in disabledTools", () => {
+  const server = { disabledTools: ["web_search", "other"] };
+  assert.equal(isToolEnabled(server, "web_search"), false);
+});
+
+test("isToolEnabled returns true when disabledTools is null or missing", () => {
+  assert.equal(isToolEnabled({}, "any_tool"), true);
+  assert.equal(isToolEnabled({ disabledTools: null }, "any_tool"), true);
+  assert.equal(isToolEnabled(null, "any_tool"), true);
+});
+
+test("mergeMcps normalizes disabledTools to an array", () => {
+  const mcps = mergeMcps([
+    { id: DEFAULT_EXA_MCP_ID, name: "Exa", url: "https://example.com", disabledTools: ["a"] },
+    { id: "custom", name: "Custom", url: "https://custom.com", disabledTools: null },
+    { id: "other", name: "Other", url: "https://other.com" },
+  ]);
+
+  assert.deepEqual(mcps[0].disabledTools, ["a"]);
+  assert.deepEqual(mcps[1].disabledTools, []);
+  assert.deepEqual(mcps[2].disabledTools, []);
 });

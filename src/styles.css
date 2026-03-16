@@ -1336,9 +1336,21 @@ textarea {
   align-items: center;
   padding: 8px 12px;
   border-radius: 999px;
+  border: 1px solid transparent;
   background: rgba(37, 33, 28, 0.08);
   font-family: var(--font-mono);
   font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, opacity 180ms ease;
+}
+
+.tool-chip:hover {
+  border-color: rgba(37, 33, 28, 0.2);
+}
+
+.tool-chip-disabled {
+  opacity: 0.45;
+  text-decoration: line-through;
 }
 
 .loading-lines {

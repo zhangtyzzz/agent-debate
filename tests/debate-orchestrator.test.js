@@ -197,6 +197,20 @@ test("buildJudgeMessages uses transcript turns as separate messages and appends 
   assert.match(messages[4].content, /Winner: Pro/);
 });
 
+test("buildTurnMessages shows 'No tools available' when toolCatalog is empty", () => {
+  const messages = buildTurnMessages({
+    agent: baseAgent,
+    agentKey: "pro",
+    debateContext,
+    instructions: "Write the opening argument.",
+    round: 0,
+    toolCatalog: [],
+    transcript: [],
+  });
+
+  assert.match(messages[0].content, /No tools available\./);
+});
+
 test("buildJudgeMessages adds correction guidance on retry without changing transcript shape", () => {
   const judge = {
     name: "Judge Agent",

@@ -10,6 +10,7 @@ export const DEFAULT_EXA_MCP = {
   headers: "",
   enabled: true,
   toolCache: [],
+  disabledTools: [],
 };
 
 export const DEFAULTS = {
@@ -96,8 +97,14 @@ export function mergeMcps(mcps) {
   const normalized = parsedMcps.map((item) => ({
     ...item,
     toolCache: Array.isArray(item?.toolCache) ? item.toolCache : [],
+    disabledTools: Array.isArray(item?.disabledTools) ? item.disabledTools : [],
   }));
-  return hasExa ? normalized : [{ ...DEFAULT_EXA_MCP, toolCache: [] }, ...normalized];
+  return hasExa ? normalized : [{ ...DEFAULT_EXA_MCP }, ...normalized];
+}
+
+export function isToolEnabled(server, toolName) {
+  const disabled = Array.isArray(server?.disabledTools) ? server.disabledTools : [];
+  return !disabled.includes(toolName);
 }
 
 export function normalizeBaseUrl(url) {
