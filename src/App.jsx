@@ -397,7 +397,7 @@ export function App() {
       const dataUrl = await toPng(exportShellRef.current, {
         cacheBust: true,
         pixelRatio: Math.max(2, Math.min(3, globalThis.devicePixelRatio || 1)),
-        backgroundColor: "#f6f1e8",
+        backgroundColor: "#faf8f5",
       });
       const anchor = document.createElement("a");
       anchor.href = dataUrl;
@@ -466,17 +466,19 @@ export function App() {
                 </button>
               ))}
             </nav>
-            <label className="locale-switch">
-              <span>{t("languageLabel")}</span>
-              <select value={data.defaults.locale} onChange={(event) => updateLocale(event.target.value)}>
-                <option value="zh-CN">中文</option>
-                <option value="en">English</option>
-              </select>
-            </label>
-            <span className={settingsStatusClass}>{settingsReady ? t("settingsReady") : t("settingsRequired")}</span>
-            <button className="ghost-button" type="button" onClick={handleClearStorage}>
-              {t("clearLocalData")}
-            </button>
+            <div className="topbar-meta">
+              <label className="locale-switch">
+                <span>{t("languageLabel")}</span>
+                <select value={data.defaults.locale} onChange={(event) => updateLocale(event.target.value)}>
+                  <option value="zh-CN">中文</option>
+                  <option value="en">English</option>
+                </select>
+              </label>
+              <span className={settingsStatusClass}>{settingsReady ? t("settingsReady") : t("settingsRequired")}</span>
+              <button className="ghost-button" type="button" onClick={handleClearStorage}>
+                {t("clearLocalData")}
+              </button>
+            </div>
           </div>
         </header>
 
@@ -703,7 +705,7 @@ export function App() {
         </main>
       </div>
 
-      <div className={`inline-feedback toast-feedback ${feedback.text ? "visible" : ""}${feedback.error ? " error" : ""}`}>
+      <div role="status" className={`inline-feedback toast-feedback ${feedback.text ? "visible" : ""}${feedback.error ? " error" : ""}`}>
         {feedback.text}
       </div>
     </>
