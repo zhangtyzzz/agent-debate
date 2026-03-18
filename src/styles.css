@@ -1152,6 +1152,56 @@ textarea {
   color: #f8f4ef;
 }
 
+.ai-response [data-streamdown="code-block"],
+.ai-response [data-streamdown="table-wrapper"],
+.ai-response [data-streamdown="mermaid-block"],
+.markdown-body [data-streamdown="code-block"],
+.markdown-body [data-streamdown="table-wrapper"],
+.markdown-body [data-streamdown="mermaid-block"] {
+  margin: 12px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ai-response [data-streamdown="code-block-header"],
+.ai-response [data-streamdown="mermaid-block"] > div:first-child,
+.markdown-body [data-streamdown="code-block-header"],
+.markdown-body [data-streamdown="mermaid-block"] > div:first-child {
+  padding: 0 4px;
+}
+
+.ai-response [data-streamdown="code-block-body"],
+.markdown-body [data-streamdown="code-block-body"] {
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(36, 33, 29, 0.94);
+}
+
+.ai-response [data-streamdown="code-block-body"] pre,
+.markdown-body [data-streamdown="code-block-body"] pre {
+  margin: 0;
+  border-radius: 0;
+}
+
+.ai-response [data-streamdown="table-wrapper"] > div:last-child,
+.markdown-body [data-streamdown="table-wrapper"] > div:last-child {
+  border-radius: 10px;
+  border: 1px solid rgba(44, 37, 32, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.ai-response [data-streamdown="mermaid-block"] > div:last-child,
+.markdown-body [data-streamdown="mermaid-block"] > div:last-child {
+  overflow: hidden;
+  border: 1px solid rgba(44, 37, 32, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
 .ai-response pre code,
 .markdown-body pre code {
   background: transparent;
@@ -1168,11 +1218,10 @@ textarea {
   font-style: italic;
 }
 
-/* Streamdown table wrapper: remove its default border, let <table> own the shape */
 [data-streamdown="table-wrapper"] {
   border: 0;
-  border-radius: 10px;
-  overflow: hidden;
+  border-radius: 0;
+  overflow: visible;
 }
 
 .ai-response table,
