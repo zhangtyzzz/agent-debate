@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component {
           minHeight: "100vh",
           padding: "2rem",
           fontFamily: "var(--font-sans, sans-serif)",
-          color: "var(--ink, #25211c)",
+          color: "var(--ink, #2c2520)",
         }}>
           <div style={{
             maxWidth: "480px",
@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component {
             <h2 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 800 }}>
               Something went wrong
             </h2>
-            <p style={{ margin: 0, color: "var(--muted, #72685c)", lineHeight: 1.6 }}>
+            <p style={{ margin: 0, color: "var(--muted, #72685c)", lineHeight: 1.6, overflowWrap: "anywhere" }}>
               {this.state.error?.message || "An unexpected error occurred."}
             </p>
             <div>
@@ -45,9 +45,9 @@ export class ErrorBoundary extends Component {
                   padding: "12px 24px",
                   border: "1px solid rgba(37, 33, 28, 0.12)",
                   borderRadius: "999px",
-                  background: "var(--accent, #bc6a41)",
-                  color: "#fffaf5",
-                  fontWeight: 800,
+                  background: "var(--accent, #5b7b9a)",
+                  color: "#fff",
+                  fontWeight: 700,
                   cursor: "pointer",
                   fontSize: "0.95rem",
                 }}
